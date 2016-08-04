@@ -129,8 +129,20 @@ class BC_Player_Management_API extends BC_API {
 
 		$url = esc_url_raw( self::BASE_URL . $bc_accounts->get_account_id() . '/players/' . $player_id );
 
-		return $this->send_request( $url );
+		$players = $this->send_request( $url );
 
+		if ( ! empty( $players['items'] ) ) {
+			// Filter the players.
+			$players['items'] = apply_filters( 'brightcove_player_list', $players['items'] );
+
+			// Reindex (possibly filtered) player items.
+			$players['items'] = array_values( $players['items'] );
+
+			// Update the item count.
+			$players['item_count'] = count( $players['items'] );
+		}
+
+		return $players;
 	}
 
 	/**
